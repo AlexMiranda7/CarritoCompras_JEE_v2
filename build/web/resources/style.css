@@ -1,0 +1,38 @@
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+body {
+  font-family: "Open Sans", sans-serif;
+  color: #444444;
+}
+
+a {
+  color: #24D1FF;
+}
+
+a:hover {
+  color: #5faee3;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Raleway", sans-serif;
+}
+
+h1{
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-top: 5px;
+  padding: 10px;
+}
+
+div {
+  margin-left: 20%;
+  margin-right: 20%;
+  margin-top: 15px;
+  padding: 5px;
+}
+
+input{
+    margin: 3px;
+}
