@@ -10,8 +10,16 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface ListaCarritoRemote {
+    
     void agprod(Productos productos);
+    
     List<Productos> Productos();
+    
+    public Boolean carritoEmpty();
+    
+    public int montoTotalEnCarrito();
+    
+    public void vaciarCarrito();
     
     //Otros intentos
     //void agprod(String n,int p, int c);

@@ -26,5 +26,22 @@ public class ListaCarritos implements ListaCarritoRemote{
        return items;
     }
 
-  
+    @Override
+    public Boolean carritoEmpty() {
+         return this.items.isEmpty();
+    }
+
+    @Override
+    public int montoTotalEnCarrito() {
+       int Total = 0;
+        for (Productos producto : items) {
+            Total = Total + producto.getPrecioTotal();
+        }
+        return Total;
+    }
+
+    @Override
+    public void vaciarCarrito() {
+        items.clear();
+    }
 }

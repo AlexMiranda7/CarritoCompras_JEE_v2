@@ -3,10 +3,12 @@ package org.apache.jsp;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
+import javax.ejb.EJB;
 import java.util.List;
 import javax.naming.InitialContext;
 import utils.ListaCarritoRemote;
 import utils.Productos;
+import utils.ListaCarritos;
 
 public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
     implements org.apache.jasper.runtime.JspSourceDependent {
@@ -19,7 +21,7 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
         try
         {
                InitialContext ic = new InitialContext();
-               items = (ListaCarritoRemote)ic.lookup("java:global/CarritoCompras_JEE/ListaCarrito");
+               items = (ListaCarritoRemote)ic.lookup("java:global/CarritoCompras_JEE/ListaCarritos");//AQUI ME ESTABA FALTANDO UNA S
         }
         catch(Exception e) { System.out.println(e);}
     }
@@ -69,30 +71,11 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("\n");
       out.write('\n');
  
-    /*if(request.getParameter("addItem")!=null)
-    {
-        String n = request.getParameter("nproducto");
-        int p = Integer.parseInt(request.getParameter("pproducto")); 
-        int c = Integer.parseInt(request.getParameter("cproducto"));
-        values.agprod(setNombreProducto(n));
-        
-    }*/
-    /*if(request.getParameter("nproducto")!=null)
-    {
-        String n = request.getParameter("nproducto");
-        int p = Integer.parseInt(request.getParameter("pproducto")); 
-        int c = Integer.parseInt(request.getParameter("cproducto"));
-        Productos newProductos = new Productos(); //Se crea constructor
-        newProductos.setNombreProducto(n); //Se setea la variable de formulario en la clase productos - nombre del producto
-        newProductos.setPrecio(p);
-        newProductos.setCantidad(c);
-        items.agprod(newProductos);
-        
-    }*/
+    
      if (request.getParameter("agregarProducto") != null) {
-        String nombreDelProducto = request.getParameter("nombreDelProducto");
-        int precioDelProducto = Integer.parseInt(request.getParameter("precioDelProducto"));
-        int cantidadDelProducto = Integer.parseInt(request.getParameter("cantidadDelProducto"));
+        String nombreDelProducto = request.getParameter("nproducto");
+        int precioDelProducto = Integer.parseInt(request.getParameter("pproducto"));
+        int cantidadDelProducto = Integer.parseInt(request.getParameter("cproducto"));
         
         items.agprod(new Productos(nombreDelProducto, precioDelProducto, cantidadDelProducto));
     }
@@ -104,8 +87,8 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("<html>\n");
       out.write("    <head>\n");
       out.write("        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
-      out.write("        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></meta>\n");
-      out.write("        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We\" crossorigin=\"anonymous\"></link>\n");
+      out.write("        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
+      out.write("        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We\" crossorigin=\"anonymous\"/>\n");
       out.write("        <link href=\"resources/style.css\" rel=\"stylesheet\"> \n");
       out.write("        <title>JSP Page</title>\n");
       out.write("    </head>\n");
@@ -119,49 +102,56 @@ public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
       out.write("            <input class=\"form-control\" type=\"text\" placeholder=\"$\" name=\"pproducto\"><br>\n");
       out.write("            <label>Cantidad:</label>\n");
       out.write("            <input class=\"form-control\" type=\"text\" placeholder=\"\" name=\"cproducto\"><br>\n");
-      out.write("            <button type=\"submit\" class=\"btn btn-dark\" value=\"Add\" name=\"addItem\">Agregar </button>\n");
+      out.write("            <button type=\"submit\" id=\"agregarProducto\" class=\"btn btn-dark\" value=\"agregarProducto\" name=\"agregarProducto\">Agregar </button>\n");
       out.write("            <!--<button type=\"submit\" class=\"btn btn-dark\" value=\"Remove\" name=\"remItem\"> Remover</button>-->\n");
       out.write("        </form>\n");
       out.write("        </div>\n");
-      out.write("        <hr class=\"my-12\"/>\n");
-      out.write("        \n");
-      out.write("        <div>\n");
-      out.write("            <table class=\"table\">\n");
-      out.write("                <thead>\n");
-      out.write("                    <tr>\n");
-      out.write("                        <th scope=\"col\">Nombre del Producto</th>\n");
-      out.write("                        <th scope=\"col\">Precio</th>\n");
-      out.write("                        <th scope=\"col\">Cantidad</th>\n");
-      out.write("                        <th scope=\"col\">Total precio</th>\n");
-      out.write("                    </tr>\n");
-      out.write("                </thead>         \n");
-      out.write("                <tbody>\n");
-  
-                if(items!=null)
-                {
-                    
-                    
-                    List<Productos> volados = items.Productos();
-                    for (Productos productos : volados)
-                    {
-                        out.println("<tr>");
-                        out.println("<td>" + productos.getNombreProducto() + "</td>");
-                        out.println("<td>" + 34 + "</td>");
-                        out.println("<td>" + 45 + "</td>");
-                        out.println("<td>" + 45 + "</td>");
-                        out.println("</tr>");
-                    }
-                    
-                }
+      out.write("        ");
  
+                    if (!items.carritoEmpty()) {
+                        List<Productos> listaProductos = items.Productos();
+                        out.println("<div class=\"col-12 offset-lg-2 offset-xl-3 col-lg-8 col-xl-6 mt-5\">");
+                        out.println("<table class=\"table\">");
+                        out.println("<thead>");
+                        out.println(" <tr>");
+                        out.println("<th scope=\"col\">Nombre del producto</th>");
+                        out.println("<th scope=\"col\">Precio/Unidad</th>");
+                        out.println("<th scope=\"col\">Cantidad</th>");
+                        out.println("<th scope=\"col\">Precio producto</th>");
+                        out.println("</tr>");
+                        out.println("</thead>");
+                        out.println("<tbody>");
+                        for (Productos volados : listaProductos) {
+                            out.println("<tr>");
+                            out.println("<td>" + volados.getNombreProducto() + "</td>");
+                            Integer precioProducto = volados.getPrecio();
+                            String precioDolares = Integer.toString(precioProducto / 100);
+                            String centavos = Integer.toString(precioProducto % 100);
+                            out.println("<td  class=\"text-center\">$" + precioDolares + "." + (centavos.length() == 1 ? centavos + "0" : centavos) + "</td>");
+                            out.println("<td  class=\"text-center\">" + Integer.toString(volados.getCantidad()) + "</td>");
+                            Integer precioTotalProducto = volados.getPrecioTotal();
+                            String precioTotalDolares = Integer.toString(precioTotalProducto / 100);
+                            String centavosTotal = Integer.toString(precioTotalProducto % 100);
+                            out.println("<td  class=\"text-center\">$" + precioTotalDolares + "." + (centavosTotal.length() == 1 ? centavosTotal + "0" : centavosTotal) + "</td>");
+                            out.println("</tr>");
+                        }
+                        out.println("<thead>");
+                        out.println(" <tr>");
+                        out.println("<th class=\"text-end\" scope=\"col\" colspan=\"3\">Total de compra</th>");
+                        Integer montoTotalEnCarrito = items.montoTotalEnCarrito();
+                        String montoTotalEnCarritoEnDolares = Integer.toString(items.montoTotalEnCarrito() / 100);
+                        String montoTotalEnCarritoCentavos = Integer.toString(items.montoTotalEnCarrito() % 100);
+                        out.println("<th class=\"text-center\" scope=\"col\">$" + montoTotalEnCarritoEnDolares + "." + (montoTotalEnCarritoCentavos.length() == 1 ? montoTotalEnCarritoCentavos + "0" : montoTotalEnCarritoCentavos) +  "</th>");
+                        out.println("</tr>");
+                        out.println("</thead>");
+                        out.println("</tbody></table></div>");
+                    } else {
+                        out.println("<div class=\"col-12 offset-lg-2 offset-xl-3 col-lg-8 col-xl-6 mt-5\">");
+                        out.println("<h5 class=\"text-center text-primary\">No hay productos en el carrito de compras.</h5>");
+                        out.println("</div>");
+                    }
+                
       out.write("\n");
-      out.write("    \n");
-      out.write("                    \n");
-      out.write("         \n");
-      out.write("                    \n");
-      out.write("                </tbody>\n");
-      out.write("         </table>\n");
-      out.write("        </div>\n");
       out.write("    </body>\n");
       out.write("</html>\n");
     } catch (Throwable t) {
